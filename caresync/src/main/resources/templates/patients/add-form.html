@@ -1,0 +1,7 @@
+<h2>Unos novog pacijenta</h2>
+<form th:action="@{/patients/save}" th:object="${patient}" method="POST">
+    <input type="text" th:field="*{firstName}" placeholder="Ime" required>
+    <input type="text" th:field="*{lastName}" placeholder="Prezime" required>
+    <input type="text" th:field="*{jmbg}" placeholder="JMBG" required>
+    <button type="submit">Sačuvaj</button>
+</form>

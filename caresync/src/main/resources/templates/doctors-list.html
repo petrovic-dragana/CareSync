@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CareSync - Naši Lekari</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Tim naših stručnjaka</h1>
+<hr>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Ime</th>
+        <th>Prezime</th>
+        <th>Specijalizacija</th>
+        <th>Licenca</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="d : ${sviDoktori}">
+        <td th:text="${d.id}"></td>
+        <td th:text="${d.firstName}"></td>
+        <td th:text="${d.lastName}"></td>
+        <td th:text="${d.specialization}"></td>
+        <td th:text="${d.licenseNumber}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+<a href="/">Nazad na početnu</a>
+</body>
+</html>

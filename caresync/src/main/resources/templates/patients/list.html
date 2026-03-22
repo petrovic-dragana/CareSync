@@ -1,0 +1,19 @@
+<table class="styled-table">
+    <thead>
+    <tr>
+        <th>Ime i Prezime</th>
+        <th>JMBG</th>
+        <th>Akcije</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${patients}">
+        <td th:text="${p.firstName + ' ' + p.lastName}"></td>
+        <td th:text="${p.jmbg}"></td>
+        <td>
+            <a th:href="@{/patients/delete/{id}(id=${p.id})}" class="btn-delete">Obriši</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a href="/patients/add">Dodaj novog pacijenta</a>
