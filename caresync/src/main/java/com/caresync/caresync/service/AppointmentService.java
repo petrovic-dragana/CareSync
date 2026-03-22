@@ -16,8 +16,19 @@ public class AppointmentService {
         return storage.getAppointments();
     }
 
-    public void addAppointment(Appointment appointment) {
-        // Ovde bi išla logika: npr. provera da li je lekar slobodan
+//    public void addAppointment(Appointment appointment) {
+//        // Ovde bi išla logika: npr. provera da li je lekar slobodan
+//        storage.getAppointments().add(appointment);
+//    }
+
+    public void saveAppointment(Appointment appointment) {
+        if (appointment.getId() == null) {
+            appointment.setId((long)(storage.getAppointments().size() + 1));
+
+        }
+        if (appointment.getStatus() == null) {
+            appointment.setStatus("ZAKAZANO");
+        }
         storage.getAppointments().add(appointment);
     }
 }

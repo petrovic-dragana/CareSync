@@ -1,0 +1,21 @@
+<form th:action="@{/appointments/save}" th:object="${appointment}" method="POST">
+
+    <label>Datum i vreme:</label>
+    <input type="datetime-local" th:field="*{dateTime}" required>
+
+    <label>Izaberi pacijenta:</label>
+    <select th:field="*{patient.id}">
+        <option th:each="p : ${allPatients}"
+                th:value="${p.id}"
+                th:text="${p.firstName + ' ' + p.lastName}"></option>
+    </select>
+
+    <label>Izaberi doktora:</label>
+    <select th:field="*{doctor.id}">
+        <option th:each="d : ${allDoctors}"
+                th:value="${d.id}"
+                th:text="${d.firstName + ' ' + d.lastName + ' (' + d.specialization + ')'}"></option>
+    </select>
+
+    <button type="submit">Zakaži termin</button>
+</form>
