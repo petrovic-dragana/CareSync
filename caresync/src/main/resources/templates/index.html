@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header_extras}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>CareSync | Dashboard</title>
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <h1>Kontrolna tabla</h1>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Registrovani Pacijenti</h3>
+            <p th:text="${totalPatients}">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Ukupno Zakazano</h3>
+            <p th:text="${totalAppointments}">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Aktivni Lekari</h3>
+            <p th:text="${totalDoctors}">0</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <a href="/appointments/add" class="btn btn-primary">Nova rezervacija</a>
+        <a href="/patients/add" class="btn btn-secondary">Dodaj pacijenta</a>
+    </div>
+</div>
+</body>
+</html>

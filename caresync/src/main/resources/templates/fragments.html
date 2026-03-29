@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header_extras">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<nav th:fragment="navbar" class="navbar">
+    <a th:href="@{/}" class="logo"><i class="fas fa-heartbeat"></i> CareSync</a>
+    <ul>
+        <li><a th:href="@{/}"><i class="fas fa-home"></i> Početna</a></li>
+        <li><a th:href="@{/patients}"><i class="fas fa-user-injured"></i> Pacijenti</a></li>
+        <li><a th:href="@{/doctors}"><i class="fas fa-user-md"></i> Lekari</a></li>
+        <li><a th:href="@{/appointments}"><i class="fas fa-calendar-check"></i> Termini</a></li>
+    </ul>
+</nav>
+
+<footer th:fragment="footer" style="text-align: center; padding: 20px; color: #64748b;">
+    <p>&copy; 2026 CareSync Poliklinika</p>
+</footer>
+
+</body>
+</html>

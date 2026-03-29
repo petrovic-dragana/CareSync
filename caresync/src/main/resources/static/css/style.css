@@ -1,31 +1,174 @@
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary: #64748b;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --text: #1e293b;
+}
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    padding: 20px;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
 }
 
-h1 {
-    color: #2c3e50;
+/* Navbar */
+.navbar {
+    background: var(--white);
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-table {
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.navbar ul {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+    margin: 0;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: var(--secondary);
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.navbar a:hover { color: var(--primary); }
+
+/* Container & Layout */
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.stat-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    text-align: center;
+    border-top: 4px solid var(--primary);
+}
+
+.stat-card h3 { margin: 0; color: var(--secondary); font-size: 0.9rem; text-transform: uppercase; }
+.stat-card p { font-size: 2.5rem; font-weight: 800; margin: 10px 0; color: var(--primary); }
+
+/* Tables */
+.styled-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-th, td {
+.styled-table th { background: #f1f5f9; padding: 15px; text-align: left; }
+.styled-table td { padding: 15px; border-top: 1px solid #f1f5f9; }
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-danger { background: var(--danger); color: white; }
+
+/* Forms */
+.card-form {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+input, select {
+    width: 100%;
     padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+/* Stilovi za forme */
+.card-form {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 550px;
+    margin: 40px auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
-th {
-    background-color: #3498db;
-    color: white;
+.form-group {
+    margin-bottom: 20px;
 }
 
-tr:hover {
-    background-color: #f1f1f1;
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--secondary);
+    font-size: 0.9rem;
+}
+
+input[type="text"], input[type="datetime-local"], select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-secondary {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
 }

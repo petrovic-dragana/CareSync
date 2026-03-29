@@ -1,19 +1,39 @@
-<table class="styled-table">
-    <thead>
-    <tr>
-        <th>Ime i Prezime</th>
-        <th>JMBG</th>
-        <th>Akcije</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="p : ${patients}">
-        <td th:text="${p.firstName + ' ' + p.lastName}"></td>
-        <td th:text="${p.jmbg}"></td>
-        <td>
-            <a th:href="@{/patients/delete/{id}(id=${p.id})}" class="btn-delete">Obriši</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<a href="/patients/add">Dodaj novog pacijenta</a>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header_extras}">
+    <title>CareSync - Pacijenti</title>
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Baza pacijenata</h2>
+        <a href="/patients/add" class="btn btn-primary">+ Registruj novog</a>
+    </div>
+
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th>Ime i prezime</th>
+            <th>JMBG</th>
+            <th>Email</th>
+            <th>Telefon</th>
+            <th>Akcije</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${patients}">
+            <td th:text="${p.firstName + ' ' + p.lastName}"></td>
+            <td th:text="${p.jmbg}"></td>
+            <td th:text="${p.email}"></td>
+            <td th:text="${p.phone}"></td>
+            <td>
+                <a th:href="@{/patients/delete/{id}(id=${p.id})}" class="btn-danger" style="padding: 5px 10px; border-radius: 4px; text-decoration: none;">Obriši</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

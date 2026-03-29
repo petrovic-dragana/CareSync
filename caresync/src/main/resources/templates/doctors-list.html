@@ -1,35 +1,77 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>CareSync - Naši Lekari</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+<head th:replace="~{fragments :: header_extras}">
+    <title>CareSync | Naši Lekari</title>
 </head>
 <body>
-<h1>Tim naših stručnjaka</h1>
-<hr>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Ime</th>
-        <th>Prezime</th>
-        <th>Specijalizacija</th>
-        <th>Licenca</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="d : ${sviDoktori}">
-        <td th:text="${d.id}"></td>
-        <td th:text="${d.firstName}"></td>
-        <td th:text="${d.lastName}"></td>
-        <td th:text="${d.specialization}"></td>
-        <td th:text="${d.licenseNumber}"></td>
-    </tr>
-    </tbody>
-</table>
+<div th:replace="~{fragments :: navbar}"></div>
 
-<br>
-<a href="/">Nazad na početnu</a>
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Tim naših stručnjaka</h2>
+        <div style="display: flex; gap: 15px;">
+            <input type="text" id="searchName" onkeyup="filterTable()"
+                   placeholder="Pretraži po imenu..." class="form-control"
+                   style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+
+            <input type="text" id="searchSpec" onkeyup="filterTable()"
+                   placeholder="Pretraži po specijalizaciji..." class="form-control"
+                   style="padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+        </div>
+    </div>
+
+    <table class="styled-table" id="doctorsTable">
+        <thead>
+        <tr>
+            <th>Ime i prezime</th>
+            <th>Specijalizacija</th>
+            <th>Broj licence</th>
+            <th>Akcije</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${sviDoktori}">
+            <td class="doc-name" th:text="${d.firstName + ' ' + d.lastName}" style="font-weight: 600;"></td>
+            <td class="doc-spec">
+                <span th:text="${d.specialization}"
+                      style="background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 15px; font-size: 0.85rem;">
+                </span>
+            </td>
+            <td th:text="${d.licenseNumber}"></td>
+            <td>
+                <a th:href="@{/appointments/add(doctorId=${d.id})}" class="btn btn-primary" style="font-size: 0.8rem;">
+                    Zakaži termin
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+
+<script>
+    function filterTable() {
+        // Uzimamo vrednosti iz oba polja
+        let nameInput = document.getElementById("searchName").value.toLowerCase();
+        let specInput = document.getElementById("searchSpec").value.toLowerCase();
+
+        let table = document.getElementById("doctorsTable");
+        let tr = table.getElementsByTagName("tr");
+
+        // Idemo kroz sve redove (preskačemo zaglavlje i = 1)
+        for (let i = 1; i < tr.length; i++) {
+            let nameCol = tr[i].querySelector(".doc-name").innerText.toLowerCase();
+            let specCol = tr[i].querySelector(".doc-spec").innerText.toLowerCase();
+
+            // Provera da li red zadovoljava oba uslova
+            if (nameCol.includes(nameInput) && specCol.includes(specInput)) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+</script>
 </body>
 </html>

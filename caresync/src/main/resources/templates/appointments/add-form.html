@@ -1,21 +1,87 @@
-<form th:action="@{/appointments/save}" th:object="${appointment}" method="POST">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header_extras}">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>CareSync | Zakazivanje</title>
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
 
-    <label>Datum i vreme:</label>
-    <input type="datetime-local" th:field="*{dateTime}" required>
+<div class="container">
+    <div class="card-form">
+        <h2 style="margin-top: 0; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+            <i class="fas fa-calendar-plus"></i> Novi termin
+        </h2>
 
-    <label>Izaberi pacijenta:</label>
-    <select th:field="*{patient.id}">
-        <option th:each="p : ${allPatients}"
-                th:value="${p.id}"
-                th:text="${p.firstName + ' ' + p.lastName}"></option>
-    </select>
+        <form th:action="@{/appointments/save}" th:object="${appointment}" method="POST" style="margin-top: 20px;">
 
-    <label>Izaberi doktora:</label>
-    <select th:field="*{doctor.id}">
-        <option th:each="d : ${allDoctors}"
-                th:value="${d.id}"
-                th:text="${d.firstName + ' ' + d.lastName + ' (' + d.specialization + ')'}"></option>
-    </select>
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Datum i vreme</label>
+                <input type="datetime-local" th:field="*{dateTime}" step="1800" required id="datePicker" onchange="validateDoctorDay()">
+                <small id="errorText" style="color: #ef4444; display: none; font-weight: bold; margin-top: 5px;"></small>
+            </div>
 
-    <button type="submit">Zakaži termin</button>
-</form>
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Izaberi pacijenta</label>
+                <select th:field="*{patient.id}" required>
+                    <option value="" disabled selected>-- Odaberi pacijenta --</option>
+                    <option th:each="p : ${allPatients}"
+                            th:value="${p.id}"
+                            th:text="${p.firstName + ' ' + p.lastName + ' (JMBG: ' + p.jmbg + ')'}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-user-md"></i> Izaberi lekara</label>
+                <select th:field="*{doctor.id}" required>
+                    <option value="" disabled selected>-- Odaberi lekara --</option>
+                    <option th:each="d : ${allDoctors}"
+                            th:value="${d.id}"
+                            th:text="${d.firstName + ' ' + d.lastName + ' [' + d.specialization + ']'}"></option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <button type="submit" class="btn btn-primary" style="flex: 2;">
+                    Zakaži termin
+                </button>
+                <a href="/appointments" class="btn btn-secondary" style="flex: 1; text-align: center;">Nazad</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script th:inline="javascript">
+    function validateDoctorDay() {
+        const picker = document.getElementById('datePicker');
+        const errorText = document.getElementById('errorText');
+        const selectedDate = new Date(picker.value);
+
+        if (isNaN(selectedDate.getTime())) return;
+
+        const day = selectedDate.getDay(); // 0=Ned, 1=Pon...
+        const minutes = selectedDate.getMinutes();
+
+        let errorMessage = "";
+
+        // 1. Provera za vikend
+        if (day === 0 || day === 6) {
+            errorMessage = "⚠️ Poliklinika ne radi vikendom!";
+        }
+        // 2. Provera za minute (dozvoljavamo samo 00 i 30)
+        else if (minutes !== 0 && minutes !== 30) {
+            errorMessage = "⚠️ Termini moraju biti na pun sat ili pola sata (npr. 10:00 ili 10:30)!";
+        }
+
+        if (errorMessage !== "") {
+            errorText.innerText = errorMessage;
+            errorText.style.display = "block";
+            picker.value = ""; // Briše pogrešan unos
+        } else {
+            errorText.style.display = "none";
+        }
+    }
+</script>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

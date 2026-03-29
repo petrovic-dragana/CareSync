@@ -20,10 +20,27 @@ public class DataStorage {
     public DataStorage() {
         seedData();
     }
+
     private void seedData() {
-        branches.add(new ClinicBranch(1L, "CareSync Central", "Bulevar Oslobođenja 1", "Beograd", "011/123-456"));
-        doctors.add(new Doctor(1L, "Marko", "Marković", "Kardiolog", "LIC-12345", 1L));
+        // 1. Dodavanje lokacija (Branches)
+        ClinicBranch central = new ClinicBranch(1L, "CareSync Central", "Bulevar Oslobođenja 1", "Beograd", "011/123-456");
+        ClinicBranch nbg = new ClinicBranch(2L, "CareSync NBG", "Jurija Gagarina 20", "Novi Beograd", "011/987-654");
+        branches.add(central);
+        branches.add(nbg);
+
+        // 2. Dodavanje doktora (Povezujemo ih sa ID-jem lokacije)
+        doctors.add(new Doctor(1L, "Marko", "Marković", "Kardiolog", "LIC-12345", 1L, List.of(1,3)));
+        doctors.add(new Doctor(2L, "Jelena", "Janković", "Pedijatar", "LIC-55443", 2L, List.of(2,4)));
+        doctors.add(new Doctor(3L, "Dragan", "Stojković", "Hirurg", "LIC-99887", 3L, List.of(5)));
+
+        // 3. Dodavanje pacijenata (Da tabela ne bude prazna)
+        patients.add(new Patient(1L, "Petar", "Petrović", "1234567890123", "petar@email.com", "064/111-222", "Muški"));
+        patients.add(new Patient(2L, "Milica", "Mirić", "9876543210321", "milica@email.com", "065/333-444", "Ženski"));
+
+        // 4. Dodavanje usluga
         services.add(new MedicalService(1L, "Sistematski pregled", 5000.0, 30));
+        services.add(new MedicalService(3L, "Kontrola", 2500.0, 30));
+        services.add(new MedicalService(2L, "Ultrazvuk srca", 4500.0, 45));
     }
 
     public List<Patient> getPatients() {

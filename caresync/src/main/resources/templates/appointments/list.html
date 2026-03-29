@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header_extras}">
+    <title>CareSync - Termini</title>
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container">
+    <h2>Pregled zakazanih termina</h2>
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th>Vreme</th>
+            <th>Pacijent</th>
+            <th>Lekar</th>
+            <th>Status</th>
+            <th>Akcije</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${appointments}">
+            <td th:text="${#temporals.format(a.dateTime, 'dd.MM.yyyy HH:mm')}"></td>
+            <td th:text="${a.patient.firstName + ' ' + a.patient.lastName}"></td>
+            <td th:text="${a.doctor.firstName + ' ' + a.doctor.lastName}"></td>
+            <td><span th:text="${a.status}" style="background: #e2e8f0; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem;"></span></td>
+            <td>
+                <a th:href="@{/appointments/complete/{id}(id=${a.id})}" class="btn btn-primary" style="font-size: 0.8rem;">Završi pregled</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
