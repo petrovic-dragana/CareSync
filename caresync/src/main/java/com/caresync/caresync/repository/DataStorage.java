@@ -29,13 +29,17 @@ public class DataStorage {
         branches.add(nbg);
 
         // 2. Dodavanje doktora (Povezujemo ih sa ID-jem lokacije)
-        doctors.add(new Doctor(1L, "Marko", "Marković", "Kardiolog", "LIC-12345", 1L, List.of(1,3)));
-        doctors.add(new Doctor(2L, "Jelena", "Janković", "Pedijatar", "LIC-55443", 2L, List.of(2,4)));
-        doctors.add(new Doctor(3L, "Dragan", "Stojković", "Hirurg", "LIC-99887", 3L, List.of(5)));
+        doctors.add(new Doctor(1L, "Marko", "Marković", "Kardiolog", "LIC-123", 1L, List.of(1, 3)));
+        doctors.add(new Doctor(2L, "Jelena", "Janković", "Pedijatar", "LIC-456", 2L, List.of(2, 4)));
+        doctors.add(new Doctor(3L, "Dragan", "Stojković", "Hirurg", "LIC-789", 2L, List.of(5)));
+        doctors.add(new Doctor(4L, "Ivana", "Ivić", "Dermatolog", "LIC-000", 1L, List.of(1, 2, 3, 4, 5)));
+        doctors.add(new Doctor(5L, "Nikola", "Nikić", "Oftalmolog", "LIC-111", 1L, List.of(2, 4)));
 
         // 3. Dodavanje pacijenata (Da tabela ne bude prazna)
-        patients.add(new Patient(1L, "Petar", "Petrović", "1234567890123", "petar@email.com", "064/111-222", "Muški"));
-        patients.add(new Patient(2L, "Milica", "Mirić", "9876543210321", "milica@email.com", "065/333-444", "Ženski"));
+        patients.add(new Patient(1L, "Petar", "Petrović", "1234567890123", "petar@email.com", "064/111", "Muški"));
+        patients.add(new Patient(2L, "Milica", "Mirić", "9876543210321", "milica@email.com", "065/222", "Ženski"));
+        patients.add(new Patient(3L, "Ana", "Anić", "4455667788990", "ana@email.com", "061/333", "Ženski"));
+        patients.add(new Patient(4L, "Vuk", "Vukić", "1122334455667", "vuk@email.com", "062/444", "Muški"));
 
         // 4. Dodavanje usluga
         services.add(new MedicalService(1L, "Sistematski pregled", 5000.0, 30));

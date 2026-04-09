@@ -6,7 +6,9 @@ import com.caresync.caresync.repository.DataStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,5 +73,34 @@ public class AppointmentService {
         }
 
         storage.getAppointments().add(appointment);
+    }
+    public List<LocalTime> getAvailableSlots(Long doctorId, LocalDate date) {
+        Doctor doc = storage.getDoctors().stream()
+                .filter(d -> d.getId().equals(doctorId))
+                .findFirst().orElse(null);
+
+        if (doc == null || !doc.getWorkingDays().contains(date.getDayOfWeek().getValue())) {
+            return List.of(); // Lekar ne radi tim danom
+        }
+
+
+        List<LocalTime> slots = new ArrayList<>();
+        LocalTime start = LocalTime.of(14, 0); // Recimo od 14h
+        LocalTime end = LocalTime.of(19, 0);   // Do 19h
+
+        while (start.isBefore(end)) {
+            final LocalTime currentSlot = start;
+            // Proveri da li je ovaj slot već zauzet kod ovog doktora na taj datum
+            boolean isTaken = storage.getAppointments().stream()
+                    .anyMatch(a -> a.getDoctor().getId().equals(doctorId) &&
+                            a.getDateTime().toLocalDate().equals(date) &&
+                            a.getDateTime().toLocalTime().equals(currentSlot));
+
+            if (!isTaken) {
+                slots.add(currentSlot);
+            }
+            start = start.plusMinutes(30);
+        }
+        return slots;
     }
 }

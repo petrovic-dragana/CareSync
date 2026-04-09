@@ -7,29 +7,119 @@
 <div th:replace="~{fragments :: navbar}"></div>
 
 <div class="container">
-    <h2>Pregled zakazanih termina</h2>
+    <h2 style="color: var(--primary);"><i class="fas fa-clock"></i> Današnji / Aktivni termini</h2>
     <table class="styled-table">
         <thead>
         <tr>
             <th>Vreme</th>
             <th>Pacijent</th>
             <th>Lekar</th>
-            <th>Status</th>
-            <th>Akcije</th>
+            <th>Akcija</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="a : ${appointments}">
+        <tr th:each="a : ${activeAppointments}">
             <td th:text="${#temporals.format(a.dateTime, 'dd.MM.yyyy HH:mm')}"></td>
             <td th:text="${a.patient.firstName + ' ' + a.patient.lastName}"></td>
             <td th:text="${a.doctor.firstName + ' ' + a.doctor.lastName}"></td>
-            <td><span th:text="${a.status}" style="background: #e2e8f0; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem;"></span></td>
             <td>
-                <a th:href="@{/appointments/complete/{id}(id=${a.id})}" class="btn btn-primary" style="font-size: 0.8rem;">Završi pregled</a>
+                <button class="btn btn-primary" style="font-size: 0.8rem;"
+                        th:onclick="'openCompleteModal(' + ${a.id} + ')'">
+                    Završi pregled
+                </button>
             </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(activeAppointments)}">
+            <td colspan="4" style="text-align:center;">Nema aktivnih termina.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr style="margin: 40px 0; border: 1px solid #e2e8f0;">
+
+    <h2 style="color: #64748b; margin-top: 50px;"><i class="fas fa-history"></i> Istorija pregleda</h2>
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th>Vreme</th>
+            <th>Pacijent</th>
+            <th>Lekar</th>
+            <th>Naplaćeno</th> <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${historyAppointments}">
+            <td th:text="${#temporals.format(a.dateTime, 'dd.MM.yyyy HH:mm')}"></td>
+            <td th:text="${a.patient.firstName + ' ' + a.patient.lastName}"></td>
+            <td th:text="${a.doctor.firstName + ' ' + a.doctor.lastName}"></td>
+            <td style="font-weight: bold; color: #059669;">
+                <span th:text="${#numbers.formatDecimal(a.price, 0, 'POINT', 2, 'COMMA')} + ' RSD'"></span>
+            </td>
+            <td><span class="badge" style="background: #22c55e; color:white; padding: 4px 8px; border-radius: 5px;">ZAVRŠENO</span></td>
         </tr>
         </tbody>
     </table>
 </div>
+<div id="completeModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+    <div style="background:white; margin:10% auto; padding:20px; width:400px; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Završetak termina</h3>
+
+        <form th:action="@{/appointments/complete-process}" method="POST">
+            <input type="hidden" name="appointmentId" id="modalAppointmentId">
+
+            <div class="form-group" style="margin-bottom:15px;">
+                <label>Izaberi uslugu:</label>
+                <select name="serviceId" id="serviceSelect" class="form-control" required onchange="updatePrice()">
+                    <option value="" disabled selected>-- Odaberi uslugu --</option>
+                    <option th:each="s : ${allServices}"
+                            th:value="${s.id}"
+                            th:data-price="${s.price}"
+                            th:text="${s.name}"></option>
+                </select>
+            </div>
+
+            <div style="background:#f8fafc; padding:15px; border-radius:8px; text-align:center; margin-bottom:20px;">
+                <span style="display:block; color:#64748b; font-size:0.9rem;">Ukupna cena za naplatu:</span>
+                <strong id="modalPriceDisplay" style="font-size:1.5rem; color:var(--primary);">0.00 RSD</strong>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button type="submit" class="btn btn-primary" style="flex:2;">Potvrdi i Naplati</button>
+                <button type="button" onclick="closeModal()" class="btn btn-secondary" style="flex:1;">Odustani</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function openCompleteModal(id) {
+        document.getElementById('modalAppointmentId').value = id;
+        document.getElementById('completeModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('completeModal').style.display = 'none';
+    }
+
+    function updatePrice() {
+        const select = document.getElementById('serviceSelect');
+        const display = document.getElementById('modalPriceDisplay');
+        const selectedOption = select.options[select.selectedIndex];
+
+        // Čitamo cenu iz data-atributa koji smo stavili u HTML
+        const price = selectedOption.getAttribute('data-price');
+
+        if (price) {
+            display.innerText = parseFloat(price).toLocaleString('sr-RS') + " RSD";
+        }
+    }
+
+    // Zatvaranje modala ako se klikne van njega
+    window.onclick = function(event) {
+        const modal = document.getElementById('completeModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
 </body>
 </html>

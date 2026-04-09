@@ -17,5 +17,6 @@ public class Appointment {
     private MedicalService service;
     private ClinicBranch branch;
     private String status;
+    private Double price;
 
 }

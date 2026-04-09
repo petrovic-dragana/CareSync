@@ -13,72 +13,206 @@
             <i class="fas fa-calendar-plus"></i> Novi termin
         </h2>
 
-        <form th:action="@{/appointments/save}" th:object="${appointment}" method="POST" style="margin-top: 20px;">
+        <form th:action="@{/appointments/save}" th:object="${appointment}" method="POST" id="mainForm">
 
             <div class="form-group">
-                <label><i class="fas fa-clock"></i> Datum i vreme</label>
-                <input type="datetime-local" th:field="*{dateTime}" step="1800" required id="datePicker" onchange="validateDoctorDay()">
-                <small id="errorText" style="color: #ef4444; display: none; font-weight: bold; margin-top: 5px;"></small>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-user"></i> Izaberi pacijenta</label>
-                <select th:field="*{patient.id}" required>
-                    <option value="" disabled selected>-- Odaberi pacijenta --</option>
-                    <option th:each="p : ${allPatients}"
-                            th:value="${p.id}"
-                            th:text="${p.firstName + ' ' + p.lastName + ' (JMBG: ' + p.jmbg + ')'}"></option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-user-md"></i> Izaberi lekara</label>
-                <select th:field="*{doctor.id}" required>
+                <label>
+                    <i class="fas fa-user-md"></i> Izaberi lekara
+                    <span id="workingDaysInfo" style="color: #ef4444; font-size: 0.85rem; font-weight: bold; margin-left: 10px;"></span>
+                </label>
+                <select th:field="*{doctor.id}" id="doctorSelect" required onchange="updateDoctorInfo()">
                     <option value="" disabled selected>-- Odaberi lekara --</option>
                     <option th:each="d : ${allDoctors}"
                             th:value="${d.id}"
-                            th:text="${d.firstName + ' ' + d.lastName + ' [' + d.specialization + ']'}"></option>
+                            th:data-days="${d.workingDays}"
+                            th:text="${d.firstName + ' ' + d.lastName + ' [' + d.specialization + ']'}">
+                    </option>
                 </select>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 30px;">
-                <button type="submit" class="btn btn-primary" style="flex: 2;">
-                    Zakaži termin
-                </button>
-                <a href="/appointments" class="btn btn-secondary" style="flex: 1; text-align: center;">Nazad</a>
+            <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Izaberi datum i vreme</label>
+                <input type="date" id="dateInput" class="form-control" required onchange="fetchSlots()">
+                <div id="dateDisplay" style="margin-top: 8px; font-weight: bold; color: var(--primary); font-size: 1.1rem;"></div>
             </div>
+
+            <div id="slotsSection" style="display:none; margin-bottom: 20px;">
+                <label> Dostupni termini (klikni na vreme):</label>
+                <div id="slotsGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Izaberi pacijenta</label>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="patientType" value="existing" checked onclick="switchPatientView('existing')">
+                        Postojeći pacijent
+                    </label>
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="patientType" value="new" onclick="switchPatientView('new')">
+                        Novi pacijent
+                    </label>
+                </div>
+
+                <div id="existingPatientSection">
+                    <select th:field="*{patient.id}" id="patientSelect" class="form-control">
+                        <option value="" disabled selected>-- Odaberi pacijenta --</option>
+                        <option th:each="p : ${allPatients}" th:value="${p.id}"
+                                th:text="${p.firstName + ' ' + p.lastName + ' (' + p.jmbg + ')'}"></option>
+                    </select>
+                </div>
+
+                <div id="newPatientSection" style="display:none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed var(--primary);">
+                    <h4 style="margin-top:0; font-size: 1rem;">Brza registracija:</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="text" name="firstName" placeholder="Ime" class="form-control">
+                        <input type="text" name="lastName" placeholder="Prezime" class="form-control">
+                    </div>
+                    <input type="text" name="phone" placeholder="Broj telefona" class="form-control" style="margin-top: 10px;">
+                    <small style="color: #64748b;">* Ostale podatke možete dopuniti tokom pregleda.</small>
+                </div>
+            </div>
+
+            <input type="hidden" th:field="*{dateTime}" id="finalDateTime">
+
+            <button type="submit" class="btn btn-primary" id="submitBtn" disabled style="width: 100%;">
+                Zakaži termin
+            </button>
         </form>
     </div>
 </div>
-<script th:inline="javascript">
-    function validateDoctorDay() {
-        const picker = document.getElementById('datePicker');
-        const errorText = document.getElementById('errorText');
-        const selectedDate = new Date(picker.value);
 
-        if (isNaN(selectedDate.getTime())) return;
+<script>
+    function resetDate() {
+        document.getElementById('dateInput').value = '';
+        document.getElementById('slotsSection').style.display = 'none';
+    }
 
-        const day = selectedDate.getDay(); // 0=Ned, 1=Pon...
-        const minutes = selectedDate.getMinutes();
+    function fetchSlots() {
+        const docId = document.getElementById('doctorSelect').value;
+        const dateVal = document.getElementById('dateInput').value;
+        const grid = document.getElementById('slotsGrid');
+        const section = document.getElementById('slotsSection');
+        const dateDisplay = document.getElementById('dateDisplay');
 
-        let errorMessage = "";
-
-        // 1. Provera za vikend
-        if (day === 0 || day === 6) {
-            errorMessage = "⚠️ Poliklinika ne radi vikendom!";
-        }
-        // 2. Provera za minute (dozvoljavamo samo 00 i 30)
-        else if (minutes !== 0 && minutes !== 30) {
-            errorMessage = "⚠️ Termini moraju biti na pun sat ili pola sata (npr. 10:00 ili 10:30)!";
+        if (!dateVal) {
+            dateDisplay.innerText = "";
+            return;
         }
 
-        if (errorMessage !== "") {
-            errorText.innerText = errorMessage;
-            errorText.style.display = "block";
-            picker.value = ""; // Briše pogrešan unos
+        // --- DEO ZA ISPIS DATUMA NA SRPSKOM ---
+        const selectedDate = new Date(dateVal);
+
+        // Formatiramo datum: dan. mesec godina, dan u nedelji
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let formattedDate = selectedDate.toLocaleDateString('sr-RS', options);
+
+        // Prvo slovo u rečenici da bude veliko (opciono)
+        formattedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+        dateDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${formattedDate}`;
+        // --------------------------------------
+
+        if (!docId) return;
+
+        fetch(`/appointments/available-slots?doctorId=${docId}&date=${dateVal}`)
+            .then(response => response.json())
+            .then(slots => {
+                grid.innerHTML = '';
+                if (slots.length === 0) {
+                    grid.innerHTML = '<p style="color:red; grid-column: 1/-1;">Nema slobodnih termina za ovaj dan ili lekar tada ne radi.</p>';
+                } else {
+                    slots.forEach(time => {
+                        const btn = document.createElement('div');
+                        btn.className = 'btn btn-secondary';
+                        btn.innerText = time.substring(0, 5);
+                        btn.style.textAlign = 'center';
+                        btn.onclick = () => selectSlot(time, btn);
+                        grid.appendChild(btn);
+                    });
+                }
+                section.style.display = 'block';
+            });
+    }
+
+    function switchPatientView(type) {
+        const existingSection = document.getElementById('existingPatientSection');
+        const newSection = document.getElementById('newPatientSection');
+        const patientSelect = document.getElementById('patientSelect');
+
+        if (type === 'new') {
+            existingSection.style.display = 'none';
+            newSection.style.display = 'block';
+
+            // Neutrališemo select da Spring ne bi očekivao ID
+            patientSelect.name = "";
+            patientSelect.removeAttribute('required');
         } else {
-            errorText.style.display = "none";
+            existingSection.style.display = 'block';
+            newSection.style.display = 'none';
+
+            // Vraćamo select u normalu
+            patientSelect.name = "patient.id";
+            patientSelect.setAttribute('required', 'required');
+
+            // Brišemo inpute za novog pacijenta ako se korisnik predomisli
+            document.getElementsByName('firstName')[0].value = '';
+            document.getElementsByName('lastName')[0].value = '';
         }
+    }
+    function selectSlot(time, element) {
+        // Resetuj ostale dugmiće
+        document.querySelectorAll('#slotsGrid .btn').forEach(b => b.classList.replace('btn-primary', 'btn-secondary'));
+        // Označi izabrani
+        element.classList.replace('btn-secondary', 'btn-primary');
+
+        // Spoji datum i vreme za Spring Boot (format: yyyy-MM-ddTHH:mm)
+        const date = document.getElementById('dateInput').value;
+        document.getElementById('finalDateTime').value = date + 'T' + time;
+
+        // Omogući slanje forme
+        document.getElementById('submitBtn').disabled = false;
+    }
+    function toggleNewPatientFields() {
+        const select = document.getElementById('patientSelect');
+        const fields = document.getElementById('newPatientFields');
+
+        if (select.value === 'NEW') {
+            fields.style.display = 'block';
+            select.removeAttribute('required');
+            // BITNO: Postavljamo name na prazno da Spring ne pokuša da mapira "NEW" u Long
+            select.name = "";
+        } else {
+            fields.style.display = 'none';
+            select.setAttribute('required', 'required');
+            // Vraćamo originalno ime polja da bi se mapiralo na patient.id
+            select.name = "patient.id";
+        }
+    }
+    function updateDoctorInfo() {
+        const select = document.getElementById('doctorSelect');
+        const infoSpan = document.getElementById('workingDaysInfo');
+        const selectedOption = select.options[select.selectedIndex];
+
+        // Čitamo dane iz data-atributa (npr. [1, 3])
+        const daysRaw = selectedOption.getAttribute('data-days');
+
+        if (daysRaw) {
+            // Pretvaramo string "[1, 3]" u niz brojeva
+            const daysArray = JSON.parse(daysRaw);
+            const dayNames = {
+                1: "Pon", 2: "Uto", 3: "Sre", 4: "Čet", 5: "Pet", 6: "Sub", 7: "Ned"
+            };
+
+            const translatedDays = daysArray.map(d => dayNames[d]).join(", ");
+            infoSpan.innerText = " (Radi: " + translatedDays + ")";
+        } else {
+            infoSpan.innerText = "";
+        }
+
+        // Resetujemo datum i slotove jer smo promenili lekara
+        resetDate();
     }
 </script>
 

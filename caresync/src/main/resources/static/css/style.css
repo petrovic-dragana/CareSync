@@ -172,3 +172,11 @@ input:focus, select:focus {
 .btn-secondary:hover {
     background-color: #e2e8f0;
 }
+#dateDisplay {
+    background: #eff6ff;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+    display: inline-block;
+    min-width: 250px;
+}
